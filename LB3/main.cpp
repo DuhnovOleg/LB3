@@ -116,6 +116,35 @@ int** create_arr(int x)
 	return A;
 }
 
+void delete_vertex(int n, int** A1)
+{
+	int l = 0;
+	for (int p = 0; p < n; p++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			if (A1[p][j] == 1)
+				l++;
+		}
+		if (l == 0)
+		{
+			for (int i = p; i < n - 1; i++)
+			{
+				for (int j = 0; j < n; j++)
+					A1[i][j] = A1[i + 1][j];
+			}
+			for (int i = 0; i < n; i++)
+			{
+				for (int j = p; j < n - 1; j++)
+					A1[i][j] = A1[i][j + 1];
+			}
+			n--;
+			p--;
+		}
+		l = 0;
+	}
+}
+
 void union_graf(int** M1, int** M2, int n, int x)
 {
 	int** A1 = (int**)malloc(n * sizeof(int*));
@@ -132,43 +161,21 @@ void union_graf(int** M1, int** M2, int n, int x)
 		for (int j = 0; j < x; j++)
 			A2[i][j] = M2[i][j];
 	}		
-	if (n >= x)
+	for (int i = 0; i < x; i++)
 	{
-		for (int i = 0; i < x; i++)
+		for (int j = 0; j < x; j++)
 		{
-			for (int j = 0; j < x; j++)
-			{
-				if (A1[i][j] != A2[i][j])
-					A1[i][j] = A1[i][j] + A2[i][j];
-			}
-		}
-		for (int i = 0; i < n; i++)
-			printf("V%d ", i + 1);
-		for (int i = 0; i < n; i++)
-		{
-			printf("\n");
-			for (int j = 0; j < n; j++)
-				printf("%2d ", A1[i][j]);
+			if (A1[i][j] != A2[i][j])
+				A1[i][j] = A1[i][j] + A2[i][j];
 		}
 	}
-	else
+	for (int i = 0; i < n; i++)
+		printf("V%d ", i + 1);
+	for (int i = 0; i < n; i++)
 	{
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = 0; j < n; j++)
-			{
-				if (A1[i][j] != A2[i][j])
-					A2[i][j] = A1[i][j] + A2[i][j];
-			}
-		}
-		for (int i = 0; i < x; i++)
-			printf("V%d ", i + 1);
-		for (int i = 0; i < x; i++)
-		{
-			printf("\n");
-			for (int j = 0; j < x; j++)
-				printf("%2d ", A2[i][j]);
-		}
+		printf("\n");
+		for (int j = 0; j < n; j++)
+			printf("%2d ", A1[i][j]);
 	}
 }
 
@@ -189,71 +196,35 @@ void crossing_graf(int** M1, int** M2, int n, int x)
 			A2[i][j] = M2[i][j];
 	}
 	int s = 1;
-	if (n >= x)
+	for (int i = 0; i < x; i++)
 	{
-		for (int i = 0; i < x; i++)
+		for (int j = s; j < x; j++)
 		{
-			for (int j = s; j < x; j++)
-			{
-				if (A1[i][j] == 1 && A2[i][j] == 1)
-					A1[i][j] = 1;
-				else
-					A1[i][j] = 0;
-			}
-			s++;
-		}
-		s = x;
-		for (int i = 0; i < n; i++)
-			for (int j = s; j < n; j++)
+			if (A1[i][j] == 1 && A2[i][j] == 1)
+				A1[i][j] = 1;
+			else
 				A1[i][j] = 0;
-		s = 1;
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = s; j < n; j++)
-				A1[j][i] = A1[i][j];
-			s++;
 		}
-		for (int i = 0; i < n; i++)
-			printf("V%d ", i + 1);
-		for (int i = 0; i < n; i++)
-		{
-			printf("\n");
-			for (int j = 0; j < n; j++)
-				printf("%2d ", A1[i][j]);
-		}
+		s++;
 	}
-	else
+	s = x;
+	for (int i = 0; i < n; i++)
+		for (int j = s; j < n; j++)
+			A1[i][j] = 0;
+	s = 1;
+	for (int i = 0; i < n; i++)
 	{
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = s; j < n; j++)
-			{
-				if (A1[i][j] == 1 && A2[i][j] == 1)
-					A2[i][j] = 1;
-				else
-					A2[i][j] = 0;
-			}
-			s++;
-		}
-		s = n;
-		for (int i = 0; i < x; i++)
-			for (int j = s; j < x; j++)
-				A2[i][j] = 0;
-		s = 1;
-		for (int i = 0; i < x; i++)
-		{
-			for (int j = s; j < x; j++)
-				A2[j][i] = A2[i][j];
-			s++;
-		}
-		for (int i = 0; i < x; i++)
-			printf("V%d ", i + 1);
-		for (int i = 0; i < x; i++)
-		{
-			printf("\n");
-			for (int j = 0; j < x; j++)
-				printf("%2d ", A2[i][j]);
-		}
+		for (int j = s; j < n; j++)
+			A1[j][i] = A1[i][j];
+		s++;
+	}
+	for (int i = 0; i < n; i++)
+		printf("V%d ", i + 1);
+	for (int i = 0; i < n; i++)
+	{
+		printf("\n");
+		for (int j = 0; j < n; j++)
+			printf("%2d ", A1[i][j]);
 	}
 }
 
@@ -273,10 +244,7 @@ void annular_sum_graf(int** M1, int** M2, int n, int x)
 		for (int j = 0; j < x; j++)
 			A2[i][j] = M2[i][j];
 	}
-	bool* AB = (bool*)malloc(n * sizeof(bool));
-	for (int i = 0; i < n; i++)
-		AB[i] = false;
-	int s = 1, l = 0;
+	int s = 1;
 	for (int i = 0; i < x; i++)
 	{
 		for (int j = s; j < x; j++)
@@ -289,6 +257,7 @@ void annular_sum_graf(int** M1, int** M2, int n, int x)
 		s++;
 	}
 	s = 1;
+	int l = 0;
 	for (int i = 0; i < n; i++)
 	{
 		for (int j = s; j < n; j++)
@@ -329,6 +298,7 @@ void annular_sum_graf(int** M1, int** M2, int n, int x)
 	}
 }
 
+
 int main()
 {
 	setlocale(LC_ALL, "Ru");
@@ -352,6 +322,12 @@ int main()
 
 	printf("\n\nВведите размер: ");
 	scanf("%d", &x);
+	while (x > n)
+	{
+		printf("Размер первой матрицы должен быть меньше!");
+		printf("\nВведите другой размер, пожалуйста: ");
+		scanf("%d", &x);
+	}
 	r = create_arr(x);
 	printf("\n\n");
 	Graf* graff = init_graf(x);
