@@ -89,7 +89,7 @@ int** create_arr(int x)
 		A[i][i] = 0;
 		for (int j = s; j < x; j++)
 		{
-			if (rand() % 100 > 22)
+			if (rand() % 100 > 42)
 				A[i][j] = 0;
 			else
 				A[i][j] = 1;
@@ -114,35 +114,6 @@ int** create_arr(int x)
 			printf("%2d ", A[i][j]);
 	}
 	return A;
-}
-
-void delete_vertex(int n, int** A1)
-{
-	int l = 0;
-	for (int p = 0; p < n; p++)
-	{
-		for (int j = 0; j < n; j++)
-		{
-			if (A1[p][j] == 1)
-				l++;
-		}
-		if (l == 0)
-		{
-			for (int i = p; i < n - 1; i++)
-			{
-				for (int j = 0; j < n; j++)
-					A1[i][j] = A1[i + 1][j];
-			}
-			for (int i = 0; i < n; i++)
-			{
-				for (int j = p; j < n - 1; j++)
-					A1[i][j] = A1[i][j + 1];
-			}
-			n--;
-			p--;
-		}
-		l = 0;
-	}
 }
 
 void union_graf(int** M1, int** M2, int n, int x)
@@ -298,6 +269,155 @@ void annular_sum_graf(int** M1, int** M2, int n, int x)
 	}
 }
 
+void closure_graf(int** M1, int n, int x)
+{
+	int a, b, ** A1 = (int**)malloc(n * sizeof(int*));
+	for (int i = 0; i < n; i++)
+	{
+		A1[i] = (int*)malloc(n * sizeof(int));
+		for (int j = 0; j < n; j++)
+			A1[i][j] = M1[i][j];
+	}
+	printf("Выберите номера вершин, которые хотите замкнтуть: ");
+	scanf("%d %d", &a, &b);
+	a--; b--;
+	for (int i = 0; i < n; i++)
+	{
+		if (A1[a][i] != A1[b][i])
+		{
+			A1[a][i] = A1[a][i] + A1[b][i];
+		}
+		A1[b][i] = 0;
+	}
+	if (A1[a][a] == 0)
+		A1[a][a] = 1;
+	int l = 0;
+	for (int p = 0; p < n; p++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			if (A1[p][j] == 1)
+				l++;
+		}
+		if (l == 0)
+		{
+			for (int i = p; i < n - 1; i++)
+			{
+				for (int j = 0; j < n; j++)
+					A1[i][j] = A1[i + 1][j];
+			}
+			for (int i = 0; i < n; i++)
+			{
+				for (int j = p; j < n - 1; j++)
+					A1[i][j] = A1[i][j + 1];
+			}
+			n--;
+			p--;
+		}
+		l = 0;
+	}
+	for (int i = 0; i < n; i++)
+		printf("V%d ", i + 1);
+	for (int i = 0; i < n; i++)
+	{
+		printf("\n");
+		for (int j = 0; j < n; j++)
+			printf("%2d ", A1[i][j]);
+	}
+}
+
+void delete_vertex_graf(int** M1, int n, int x)
+{
+	int a, b, ** A1 = (int**)malloc(n * sizeof(int*));
+	for (int i = 0; i < n; i++)
+	{
+		A1[i] = (int*)malloc(n * sizeof(int));
+		for (int j = 0; j < n; j++)
+			A1[i][j] = M1[i][j];
+	}
+	printf("Выберите номера вершин, которые хотите стянуть: ");
+	scanf("%d %d", &a, &b);
+	if (A1[a][b] == A1[b][a])
+	{
+		for (int i = 0; i < n; i++)
+		{
+			if (A1[a][i] != A1[b][i])
+				A1[a][i] = A1[a][i] + A1[b][i];
+			A1[b][i] = 0;
+		}
+	}
+	if (A1[a][a] == 1)
+		A1[a][a] = 0;
+	int l = 0;
+	for (int p = 0; p < n; p++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			if (A1[p][j] == 1)
+				l++;
+		}
+		if (l == 0)
+		{
+			for (int i = p; i < n - 1; i++)
+			{
+				for (int j = 0; j < n; j++)
+					A1[i][j] = A1[i + 1][j];
+			}
+			for (int i = 0; i < n; i++)
+			{
+				for (int j = p; j < n - 1; j++)
+					A1[i][j] = A1[i][j + 1];
+			}
+			n--;
+			p--;
+		}
+		l = 0;
+	}
+	for (int i = 0; i < n; i++)
+		printf("V%d ", i + 1);
+	for (int i = 0; i < n; i++)
+	{
+		printf("\n");
+		for (int j = 0; j < n; j++)
+			printf("%2d ", A1[i][j]);
+	}
+}
+
+void split_graf(int** M1, int n, int x)
+{ 
+	int l = 0, z = n + 1, a, ** A1 = (int**)malloc(n * sizeof(int*)), ** R1 = (int**)malloc(z * sizeof(int*));
+	for (int i = 0; i < z; i++)
+	{
+		R1[i] = (int*)malloc(z * sizeof(int));
+		for (int j = 0; j < z; j++)
+			R1[i][j] = 0;
+	}
+	for (int i = 0; i < n; i++)
+	{
+		A1[i] = (int*)malloc(n * sizeof(int));
+		for (int j = 0; j < n; j++)
+			A1[i][j] = M1[i][j];
+	}
+	printf("Выберите номер вершины, которую хотите расщипить: ");
+	scanf("%d", &a);
+	a--;
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+			R1[i][j] = A1[i][j];
+			R1[n][i] = R1[a][i];
+			R1[i][n] = R1[a][i];
+	}
+	R1[n][a] = 1; R1[a][n] = 1;
+	for (int i = 0; i < z; i++)
+		printf("V%d ", i + 1);
+	for (int i = 0; i < z; i++)
+	{
+		printf("\n");
+		for (int j = 0; j < z; j++)
+			printf("%2d ", R1[i][j]);
+	}
+}
 
 int main()
 {
@@ -342,7 +462,12 @@ int main()
 	print(graff);
 
 
-	printf("\nЗадание 3.1\n"); union_graf(t, r, n, x); printf("\n\n"); _getch();
+	printf("\nЗадание 2.1\n"); closure_graf(t, n, x); printf("\n\n"); _getch(); closure_graf(r, x, n); printf("\n\n"); _getch();
+	printf("\nЗадание 2.2\n"); delete_vertex_graf(t, n, x); printf("\n\n"); _getch(); delete_vertex_graf(r, x, n); printf("\n\n"); _getch();
+	printf("\nЗадание 2.3\n"); split_graf(t, n, x); printf("\n\n"); _getch();
+
+
+	printf("\nЗадание 3.1\n"); union_graf(t, r, n, x); printf("\n\n"); _getch(); 
 	printf("\nЗадание 3.2\n"); crossing_graf(t, r, n, x); printf("\n\n"); _getch();
 	printf("\nЗадание 3.3\n"); annular_sum_graf(t, r, n, x); printf("\n\n"); _getch();
 
