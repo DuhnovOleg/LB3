@@ -54,6 +54,33 @@ void print(Graf* graf)
 	}
 }
 
+void sort_spisok(Graf* graf, int n)
+{
+	int vertex;
+	for (int i = 0; i < n - 1; i++)
+	{
+		Node* temp = graf->A2[i], * temp1 = graf->A2[i];
+		if (temp1 != NULL && temp1->Next != NULL)
+			temp1 = temp1->Next;
+		for (int j = 0; j < n; j++)
+		{
+			while (temp != NULL)
+			{
+				if (temp->vertex > temp1->vertex)
+				{
+					vertex = temp->vertex;
+					temp->vertex = temp1->vertex;
+					temp1->vertex = vertex;
+				}
+				temp = temp->Next; if (temp1->Next != NULL) temp1 = temp1->Next;
+			}
+			temp = graf->A2[i], temp1 = graf->A2[i];
+			if (temp1 != NULL && temp1->Next != NULL)
+				temp1 = temp1->Next;
+		}
+	}
+}
+
 void add_spisok(int i, int j, Graf* graf)
 {
 	Node* NewNode = init_node(j);
@@ -89,7 +116,7 @@ int** create_arr(int x)
 		A[i][i] = 0;
 		for (int j = s; j < x; j++)
 		{
-			if (rand() % 100 > 42)
+			if (rand() % 100 > 62)
 				A[i][j] = 0;
 			else
 				A[i][j] = 1;
@@ -286,12 +313,14 @@ void closure_graf(int** M1, int n, int x)
 		if (A1[a][i] != A1[b][i])
 		{
 			A1[a][i] = A1[a][i] + A1[b][i];
+			A1[i][a] = A1[a][i];
 		}
-		A1[b][i] = 0;
 	}
+	for (int i = 0; i < n; i++)
+		A1[b][i] = 0;
 	if (A1[a][a] == 0)
 		A1[a][a] = 1;
-	int l = 0;
+	int s = 1, l = 0;
 	for (int p = 0; p < n; p++)
 	{
 		for (int j = 0; j < n; j++)
@@ -326,53 +355,102 @@ void closure_graf(int** M1, int n, int x)
 	}
 }
 
-void closure_graf_spisok(int n, int x, Graf* graf)
+void closure_graf_spisok(int n, int x, Graf* g)
 {
+	Graf* graf = init_graf(n);
+	for (int i = 0; i < n; i++)
+	{
+		Node* head, * head1, * temp = g->A2[i], * temp1;
+		graf->A2[i] = (Node*)malloc(sizeof(Node));
+		temp1 = graf->A2[i];
+		if (temp != NULL)
+		{
+			temp1->vertex = temp->vertex;
+			temp = temp->Next;
+			temp1->Next = NULL;
+		}
+		else
+		{
+			graf->A2[i] = NULL;
+			temp1 = graf->A2[i];
+		}
+		while (temp)
+		{
+			temp1->Next = (Node*)malloc(sizeof(Node));
+			temp1 = temp1->Next;
+			temp1->vertex = temp->vertex;
+			temp1->Next = NULL;
+			temp = temp->Next;
+		}
+	}
 	int l = 0, a, b;
 	printf("Выберите номера вершин, которые хотите замкнтуть: ");
 	scanf("%d %d", &a, &b); a--; b--;
+	while (b <= a)
+	{
+		printf("Введите другие вершины: ");
+		scanf("%d %d", &a, &b); a--; b--;
+	}
 
 	Node* head, * heder, * kemp = graf->A2[b], * pemp = graf->A2[a], * temp = graf->A2[a];
-	while (temp->Next != NULL)
-		temp = temp->Next;
-	heder = kemp;
-	head = pemp;
-	while (kemp != NULL)
+	if (temp != NULL)
 	{
-		while (pemp != NULL)
-		{
-			if (kemp->vertex == pemp->vertex)
-				l++;
-			pemp = pemp->Next;
-		}
-		pemp = head;
-		if (l == 0)
-		{
-			temp->Next = (Node*)malloc(sizeof(Node));
+		while (temp->Next != NULL)
 			temp = temp->Next;
-			temp->vertex = kemp->vertex;
+		heder = kemp;
+		head = pemp;
+		while (kemp != NULL)
+		{
+			while (pemp != NULL)
+			{
+				if (kemp->vertex == pemp->vertex || kemp->vertex == a)
+					l++;
+				pemp = pemp->Next;
+			}
+			pemp = head;
+			if (l == 0)
+			{
+				temp->Next = (Node*)malloc(sizeof(Node));
+				temp = temp->Next;
+				temp->vertex = kemp->vertex;
+			}
+			temp->Next = NULL;
+			kemp = kemp->Next;
+			l = 0;
 		}
-		temp->Next = NULL;
-		kemp = kemp->Next;
-		l = 0;
-	}
-	kemp = heder; temp = graf->A2[a]; l = 0;
-	while (temp->Next != NULL)
-	{
-		if (temp->vertex == a)
-			l++;
-		temp = temp->Next;
-	}
-	if (l == 0)
-	{
 		temp->Next = (Node*)malloc(sizeof(Node));
 		temp = temp->Next;
 		temp->vertex = a;
 		temp->Next = NULL;
 	}
+	else
+	{
+		g->A2[a] = (Node*)malloc(sizeof(Node));
+		temp = g->A2[a];
+		temp->vertex = b;
+		temp->Next = NULL;
+	}
+	if (temp->Next != NULL)
+	{
+		temp = graf->A2[a]; l = 0;
+		while (temp->Next != NULL)
+		{
+			if (temp->vertex == a)
+				l++;
+			temp = temp->Next;
+		}
+		if (l == 0)
+		{
+			temp->Next = (Node*)malloc(sizeof(Node));
+			temp = temp->Next;
+			temp->vertex = a;
+			temp->Next = NULL;
+		}
+	}
 	for (int i = b; i < n - 1; i++)
 		graf->A2[i] = graf->A2[i + 1];
 	graf->A2[n - 1] = NULL;
+	sort_spisok(graf, n);
 	for (int i = 0; i < n - 1; i++)
 	{
 		Node* semp = graf->A2[i];
@@ -403,10 +481,14 @@ void delete_vertex_graf(int** M1, int n)
 		for (int i = 0; i < n; i++)
 		{
 			if (A1[a][i] != A1[b][i])
+			{
 				A1[a][i] = A1[a][i] + A1[b][i];
-			A1[b][i] = 0;
+				A1[i][a] = A1[a][i];
+			}	
 		}
 	}
+	for (int i = 0; i < n; i++)
+		A1[b][i] = 0;
 	if (A1[a][a] == 1)
 		A1[a][a] = 0;
 	int l = 0;
@@ -444,13 +526,39 @@ void delete_vertex_graf(int** M1, int n)
 	}
 }
 
-void delete_vertex_graf_spisok(int n, int x, Graf* graf)
+void delete_vertex_graf_spisok(int n, int x, Graf* g)
 {
+	Graf* graf = init_graf(n);
+	for (int i = 0; i < n; i++)
+	{
+		Node* head, * head1, * temp = g->A2[i], * temp1;
+		graf->A2[i] = (Node*)malloc(sizeof(Node));
+		temp1 = graf->A2[i];
+		if (temp != NULL)
+		{
+			temp1->vertex = temp->vertex;
+			temp = temp->Next;
+			temp1->Next = NULL;
+		}
+		else
+		{
+			graf->A2[i] = NULL;
+			temp1 = graf->A2[i];
+		}
+		while (temp)
+		{
+			temp1->Next = (Node*)malloc(sizeof(Node));
+			temp1 = temp1->Next;
+			temp1->vertex = temp->vertex;
+			temp1->Next = NULL;
+			temp = temp->Next;
+		}
+	}
 	int a, b, l = 0, q = 0;
 	printf("Выберите номера вершин, которые хотите стянуть: ");
 	scanf("%d %d", &a, &b); a--; b--;
 	Node* temp = graf->A2[a], * pemp = graf->A2[a], * kemp = graf->A2[b], * head, * header;
-	while (temp->Next != NULL)
+	while (temp != NULL && temp->Next != NULL)
 		temp = temp->Next;
 	head = pemp; header = kemp;
 	while (kemp != NULL)
@@ -466,7 +574,7 @@ void delete_vertex_graf_spisok(int n, int x, Graf* graf)
 		{
 			while (pemp != NULL)
 			{
-				if (kemp->vertex == pemp->vertex && kemp->vertex != a)
+				if (kemp->vertex == pemp->vertex || kemp->vertex == a)
 					l++;
 				pemp = pemp->Next;
 			}
@@ -485,11 +593,12 @@ void delete_vertex_graf_spisok(int n, int x, Graf* graf)
 	else
 	{
 		printf("\nДанные вершины нельзя стянуть!");
-		delete_vertex_graf_spisok(n, x, graf);
+		return;
 	}	
 	for (int i = b; i < n - 1; i++)
 		graf->A2[i] = graf->A2[i + 1];
 	graf->A2[n - 1] = NULL;
+	sort_spisok(graf, n);
 	for (int i = 0; i < n - 1; i++)
 	{
 		Node* semp = graf->A2[i];
@@ -525,8 +634,8 @@ void split_graf(int** M1, int n)
 	{
 		for (int j = 0; j < n; j++)
 			R1[i][j] = A1[i][j];
-			R1[n][i] = R1[a][i];
-			R1[i][n] = R1[a][i];
+		R1[n][i] = A1[a][i];
+		R1[i][n] = A1[a][i];
 	}
 	R1[n][a] = 1; R1[a][n] = 1;
 	for (int i = 0; i < z; i++)
@@ -539,8 +648,34 @@ void split_graf(int** M1, int n)
 	}
 }
 
-void split_graf_spisok(int n, int x, Graf* graf)
+void split_graf_spisok(int n, int x, Graf* gr)
 {
+	Graf* graf = init_graf(n);
+	for (int i = 0; i < n; i++)
+	{
+		Node* head, * head1, * temp = gr->A2[i], * temp1;
+		graf->A2[i] = (Node*)malloc(sizeof(Node));
+		temp1 = graf->A2[i];
+		if (temp != NULL)
+		{
+			temp1->vertex = temp->vertex;
+			temp = temp->Next;
+			temp1->Next = NULL;
+		}
+		else
+		{
+			graf->A2[i] = NULL;
+			temp1 = graf->A2[i];
+		}
+		while (temp)
+		{
+			temp1->Next = (Node*)malloc(sizeof(Node));
+			temp1 = temp1->Next;
+			temp1->vertex = temp->vertex;
+			temp1->Next = NULL;
+			temp = temp->Next;
+		}
+	}
 	int a, z = n + 1, l = 0;
 	Graf* g = init_graf(z);
 	printf("Выберите номер вершины, которую хотите расщипить: ");
@@ -548,59 +683,115 @@ void split_graf_spisok(int n, int x, Graf* graf)
 	a--;
 	for (int i = 0; i < n; i++)
 	{
-		Node * head, * head1, * temp = graf->A2[i], * temp1 = g->A2[i];
+		Node * head, * head1, * temp = graf->A2[i], * temp1;	
+		g->A2[i] = (Node*)malloc(sizeof(Node));	
+		temp1 = g->A2[i]; 
+		if (temp != NULL)
+		{
+			temp1->vertex = temp->vertex;
+			temp = temp->Next;
+			temp1->Next = NULL;
+		}
+		else
+		{
+			g->A2[i] = NULL;
+			temp1 = g->A2[i];
+		}
 		while (temp)
 		{
 			temp1->Next = (Node*)malloc(sizeof(Node));
 			temp1 = temp1->Next;
 			temp1->vertex = temp->vertex;
-			temp->Next = NULL;
+			temp1->Next = NULL;
 			temp = temp->Next;
 		}
 	}
-	Node * temp = graf->A2[a], * temp1 = g->A2[n];
+	Node* temp = graf->A2[a], * temp1; g->A2[n] = (Node*)malloc(sizeof(Node));
+	temp1 = g->A2[n];
+	if (temp != NULL)
+	{
+		temp1->vertex = temp->vertex;
+		temp = temp->Next;
+		temp1->Next = NULL;
+	}
+	else
+	{
+		g->A2[n] = NULL;
+		temp1 = g->A2[n];
+	}
 	while (temp)
 	{
 		temp1->Next = (Node*)malloc(sizeof(Node));
 		temp1 = temp1->Next;
 		temp1->vertex = temp->vertex;
-		temp->Next = NULL;
+		temp1->Next = NULL;
 		temp = temp->Next;
 	}
-	temp = graf->A2[a], temp1 = g->A2[n];
-	while (temp->Next != NULL)
+	temp = g->A2[a], temp1 = g->A2[n];
+	if (temp != NULL)
+	{
+		while (temp->Next != NULL)
+			temp = temp->Next;
+		while (temp1->Next != NULL)
+			temp1 = temp1->Next;
+		temp->Next = (Node*)malloc(sizeof(Node));
 		temp = temp->Next;
-	while (temp1->Next != NULL)
+		temp->vertex = n;
+		temp->Next = NULL;
+		temp1->Next = (Node*)malloc(sizeof(Node));
 		temp1 = temp1->Next;
-	temp->Next = (Node*)malloc(sizeof(Node));
-	temp = temp->Next;
-	temp->vertex = z;
-	temp->Next = NULL;
-
-	temp1->Next = (Node*)malloc(sizeof(Node));
-	temp1 = temp1->Next;
-	temp1->vertex = a + 1;
-	temp1->Next = NULL;
+		temp1->vertex = a;
+		temp1->Next = NULL;
+	}
+	else
+	{
+		g->A2[a] = (Node*)malloc(sizeof(Node)), g->A2[n] = (Node*)malloc(sizeof(Node));
+		temp = g->A2[a]; temp1 = g->A2[n];
+		temp->vertex = n;
+		temp->Next = NULL;
+		temp1->vertex = a;
+		temp1->Next = NULL;
+	}
 	for (int i = 0; i < n; i++)
 	{
 		Node* temp = g->A2[i];
-		while (temp != NULL)
+		if (temp != NULL)
 		{
-			if (temp->vertex == a)
-				l++;
+			while (temp->Next != NULL)
+			{
+				if (temp->vertex == a)
+					l++;
+				temp = temp->Next;
+			}
+			if (l == 1)
+			{
+				temp->Next = (Node*)malloc(sizeof(Node));
+				temp = temp->Next;
+				temp->vertex = n;
+				temp->Next = NULL;
+			}
+			l = 0;
 		}
-		if (l == 0)
+		if (temp != NULL)
 		{
-			temp->Next = (Node*)malloc(sizeof(Node));
-			temp = temp->Next;
-			temp->vertex = z;
-			temp->Next = NULL;
+			if (temp->Next == NULL && temp != NULL)
+			{
+				if (temp->vertex == a)
+					l++;
+				if (l == 1)
+				{
+					temp->Next = (Node*)malloc(sizeof(Node));
+					temp = temp->Next;
+					temp->vertex = n;
+					temp->Next = NULL;
+				}
+			}
 		}
-		l = 0;
 	}
+	sort_spisok(graf, z);
 	for (int i = 0; i < z; i++)
 	{
-		Node* semp = graf->A2[i];
+		Node* semp = g->A2[i];
 		printf("%d - ая вершина: ", i + 1);
 		while (semp != NULL)
 		{
@@ -608,6 +799,59 @@ void split_graf_spisok(int n, int x, Graf* graf)
 			semp = semp->Next;
 		}
 		printf("\n");
+	}
+}
+
+void decart_graf(int** M1, int** M2, int n, int x)
+{
+	int** A1 = (int**)malloc(n * sizeof(int*));
+	for (int i = 0; i < n; i++)
+	{
+		A1[i] = (int*)malloc(n * sizeof(int));
+		for (int j = 0; j < n; j++)
+			A1[i][j] = M1[i][j];
+	}
+	int** A2 = (int**)malloc(x * sizeof(int*));
+	for (int i = 0; i < x; i++)
+	{
+		A2[i] = (int*)malloc(x * sizeof(int));
+		for (int j = 0; j < x; j++)
+			A2[i][j] = M2[i][j];
+	}
+	int z = n * x, s = -1, l = 0;
+	int** D1= (int**)malloc(z * sizeof(int*));
+	for (int i = 0; i < z; i++)
+	{
+		D1[i] = (int*)malloc(z * sizeof(int));
+		for (int j = 0; j < z; j++)
+			D1[i][j] = 0;
+	}
+	for (int i = 0; i < n; i++)
+		for (int k = 0; k < x; k++)
+		{
+			s++;
+			l = 0;
+			for (int j = 0; j < n; j++)
+				for (int p = 0; p < x; p++)
+				{
+					if (i == p && k == j)
+						D1[s][l] = 0;
+					else if (i == j)
+						D1[s][l] = A2[k][p];
+					else if (k == p)
+						D1[s][l] = A1[i][j];
+					else
+						D1[s][l] = 0;
+					l++;
+				}
+		}
+	for (int i = 0; i < z; i++)
+		printf("V%d ", i + 1);
+	for (int i = 0; i < z; i++)
+	{
+		printf("\n");
+		for (int j = 0; j < z; j++)
+			printf("%2d ", D1[i][j]);
 	}
 }
 
@@ -657,16 +901,13 @@ int main()
 	//printf("\nЗадание 2.1.1\n"); closure_graf(t, n, x); printf("\n\n"); _getch();// closure_graf(r, x, n); printf("\n\n"); _getch();
 	//printf("\nЗадание 2.1.2\n"); delete_vertex_graf(t, n); printf("\n\n"); _getch(); //delete_vertex_graf(r, x); printf("\n\n"); _getch();
 	//printf("\nЗадание 2.1.3\n"); split_graf(t, n); printf("\n\n"); _getch();// split_graf(t, x); printf("\n\n"); _getch();
-	//printf("\nЗадание 2.2.1\n"); closure_graf_spisok(n, x, graf); printf("\n\n"); _getch();
-	//printf("\nЗадание 2.2.2\n"); delete_vertex_graf_spisok(n, x, graf); printf("\n\n"); _getch();
-	printf("\nЗадание 2.2.3\n"); split_graf_spisok(n, x, graf); printf("\n\n"); _getch();
+	//printf("\nЗадание 2.2.1\n"); closure_graf_spisok(n, x, graf); printf("\n\n"); _getch(); //printf("\nЗадание 2.2.1\n"); closure_graf_spisok(x, n, graf); printf("\n\n"); _getch();
+	//printf("\nЗадание 2.2.2\n"); delete_vertex_graf_spisok(n, x, graf); printf("\n\n"); _getch(); //printf("\nЗадание 2.2.2\n"); delete_vertex_graf_spisok(x, n, graf); printf("\n\n"); _getch();
+	//printf("\nЗадание 2.2.3\n"); split_graf_spisok(n, x, graf); printf("\n\n"); _getch(); //printf("\nЗадание 2.2.3\n"); split_graf_spisok(x, n, graf); printf("\n\n"); _getch();
 
+	//printf("\nЗадание 3.1\n"); union_graf(t, r, n, x); printf("\n\n"); _getch(); 
+	//printf("\nЗадание 3.2\n"); crossing_graf(t, r, n, x); printf("\n\n"); _getch();
+	//printf("\nЗадание 3.3\n"); annular_sum_graf(t, r, n, x); printf("\n\n"); _getch();
 
-	printf("\nЗадание 3.1\n"); union_graf(t, r, n, x); printf("\n\n"); _getch(); 
-	printf("\nЗадание 3.2\n"); crossing_graf(t, r, n, x); printf("\n\n"); _getch();
-	printf("\nЗадание 3.3\n"); annular_sum_graf(t, r, n, x); printf("\n\n"); _getch();
-
-
-
-	_getch();
+	printf("\nЗадание 4\n"); decart_graf(t, r, n, x); printf("\n\n"); _getch();
 }
