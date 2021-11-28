@@ -898,16 +898,16 @@ int main()
 	print(graff);
 
 
-	//printf("\nЗадание 2.1.1\n"); closure_graf(t, n, x); printf("\n\n"); _getch();// closure_graf(r, x, n); printf("\n\n"); _getch();
-	//printf("\nЗадание 2.1.2\n"); delete_vertex_graf(t, n); printf("\n\n"); _getch(); //delete_vertex_graf(r, x); printf("\n\n"); _getch();
-	//printf("\nЗадание 2.1.3\n"); split_graf(t, n); printf("\n\n"); _getch();// split_graf(t, x); printf("\n\n"); _getch();
-	//printf("\nЗадание 2.2.1\n"); closure_graf_spisok(n, x, graf); printf("\n\n"); _getch(); //printf("\nЗадание 2.2.1\n"); closure_graf_spisok(x, n, graf); printf("\n\n"); _getch();
-	//printf("\nЗадание 2.2.2\n"); delete_vertex_graf_spisok(n, x, graf); printf("\n\n"); _getch(); //printf("\nЗадание 2.2.2\n"); delete_vertex_graf_spisok(x, n, graf); printf("\n\n"); _getch();
-	//printf("\nЗадание 2.2.3\n"); split_graf_spisok(n, x, graf); printf("\n\n"); _getch(); //printf("\nЗадание 2.2.3\n"); split_graf_spisok(x, n, graf); printf("\n\n"); _getch();
+	printf("\nЗадание 2.1.1\n"); closure_graf(t, n, x); printf("\n\n"); _getch();// closure_graf(r, x, n); printf("\n\n"); _getch();
+	printf("\nЗадание 2.1.2\n"); delete_vertex_graf(t, n); printf("\n\n"); _getch(); //delete_vertex_graf(r, x); printf("\n\n"); _getch();
+	printf("\nЗадание 2.1.3\n"); split_graf(t, n); printf("\n\n"); _getch();// split_graf(t, x); printf("\n\n"); _getch();
+	printf("\nЗадание 2.2.1\n"); closure_graf_spisok(n, x, graf); printf("\n\n"); _getch(); //printf("\nЗадание 2.2.1\n"); closure_graf_spisok(x, n, graf); printf("\n\n"); _getch();
+	printf("\nЗадание 2.2.2\n"); delete_vertex_graf_spisok(n, x, graf); printf("\n\n"); _getch(); //printf("\nЗадание 2.2.2\n"); delete_vertex_graf_spisok(x, n, graf); printf("\n\n"); _getch();
+	printf("\nЗадание 2.2.3\n"); split_graf_spisok(n, x, graf); printf("\n\n"); _getch(); //printf("\nЗадание 2.2.3\n"); split_graf_spisok(x, n, graf); printf("\n\n"); _getch();
 
-	//printf("\nЗадание 3.1\n"); union_graf(t, r, n, x); printf("\n\n"); _getch(); 
-	//printf("\nЗадание 3.2\n"); crossing_graf(t, r, n, x); printf("\n\n"); _getch();
-	//printf("\nЗадание 3.3\n"); annular_sum_graf(t, r, n, x); printf("\n\n"); _getch();
+	printf("\nЗадание 3.1\n"); union_graf(t, r, n, x); printf("\n\n"); _getch(); 
+	printf("\nЗадание 3.2\n"); crossing_graf(t, r, n, x); printf("\n\n"); _getch();
+	printf("\nЗадание 3.3\n"); annular_sum_graf(t, r, n, x); printf("\n\n"); _getch();
 
 	printf("\nЗадание 4\n"); decart_graf(t, r, n, x); printf("\n\n"); _getch();
 }
